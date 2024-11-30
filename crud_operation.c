@@ -6,25 +6,60 @@ int UniqueId;
 char Name[20];
 int age;
 }u;
+//Check if user id is unique
+int IdCheck(int id){
+    FILE *ptr=fopen("users.txt","r");
+    struct user temp;
+    while(!feof(ptr)){
+        fscanf(ptr,"\n%d\t%s\t%d",&temp.UniqueId,&temp.Name,&temp.age);
+        if(temp.UniqueId==id){
+        fclose(ptr);
+        return 1;
+        }
+    }
+    fclose(ptr);
+    return 0;
+}
 //Add user Data
 void AddDetails(){
     FILE *ptr=fopen("users.txt","a");
     printf("Enter user details\n");
-    printf("Enter Name:");
-    scanf("%s",&u.Name);
     printf("Enter Unique ID:");
     scanf("%d",&u.UniqueId);
+    //Handles Unquie user id
+    if(!IdCheck(u.UniqueId)){
+    printf("Enter Name:");
+    scanf("%19s",u.Name);
     printf("Enter Age:");
     scanf("%d",&u.age);
     fprintf(ptr,"\n%d\t%s\t%d",u.UniqueId,u.Name,u.age);
+    printf("Successfully added the user data...");
+    }
+    else{
+        printf("UserId already exists...");
+    }
     fclose(ptr);
 }
 //Read Details from File
 void ReadDetails(){
     FILE *ptr=fopen("users.txt","r");
+    //Check of existance of file
+    if (ptr!=NULL) {
+    //Set the pointer to end of file and check size
+    fseek (ptr, 0, SEEK_END);
+    int size = ftell(ptr);
+    //Check if File is empty
+    if (0 == size) {
+        printf("File is empty\n");
+    }
+    else{
+    //Set the pointer to beginning of file
+    fseek (ptr, 0, SEEK_SET);
     while(!feof(ptr)){
         fscanf(ptr,"\n%d\t%s\t%d",&u.UniqueId,&u.Name,&u.age);
         printf("%d %s %d\n",u.UniqueId,u.Name,u.age);
+    }
+    }
     }
     fclose(ptr);
 }
