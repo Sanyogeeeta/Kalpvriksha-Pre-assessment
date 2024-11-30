@@ -12,13 +12,15 @@ int topop=-1;
 void calculate(){
     int x,y,z,n;
     char op;
+    //To check there are minimum two operands
+    if(topnum>=1){
     x=numStack[topnum--];
     y=numStack[topnum--];
     op=opStack[topop--];
     switch(op){
         case '+':z=x+y;
             break;
-        case '-':z=x-y;
+        case '-':z=y-x;
             break;
         case '*':z=x*y;
             break;
@@ -32,6 +34,12 @@ void calculate(){
             break;
     }
     numStack[++topnum]=z;
+    }
+    else{
+        topnum=-1;
+        topop=-1;
+        printf("Error: Invalid expression(Missing operand.)");
+    }
 }
 //operator precedence
 int precedence(char c){
@@ -80,6 +88,10 @@ int evaluation(char exp[]){
     }
     while(topop!=-1)
         calculate();
+    //if there is experssio error return -999
+    if(topnum==-1){
+        return -999;
+    }
     return numStack[topnum];
 }
 int main(){
@@ -87,17 +99,19 @@ int main(){
     char exp[50];
     printf("Enter Mathematical expression:");
     fgets(exp, sizeof(exp),stdin);
-    int i, j = 0;
-    /*
-    //Alternate approach if dont want to ignore it during evaluation and remove it completely from string
-    for (i = 0; i<strlen(exp); i++) {
-        if(exp[i]!=' ' && exp[i]!='\0' && exp[i]!='\n'){
-            exp[j++] = exp[i];
-        }
+    if(strlen(exp)==0||(strlen(exp)==1 && !(strcmp(" ",exp)))){
+    //Handle empty or just space expression
+        printf("Error: Invalid expression\n");
+        return 0;
     }
-    exp[j] = '\0';
-    */
+    else{
+    int i, j = 0;
     int res=0;
     res=evaluation(exp);
+    if(res==-999){
+        return 0;
+    }
+    else
     printf("The result is %d",res);
+    }
 }
