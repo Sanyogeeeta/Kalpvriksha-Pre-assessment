@@ -1,4 +1,8 @@
 
-1	abhi	21
-2	adi	23
-3	asha	20
+1 abhi 21
+2 adi 23
+3 asha 20
+4 abi 22
+5	bhim	22
+
+6	chand	25
