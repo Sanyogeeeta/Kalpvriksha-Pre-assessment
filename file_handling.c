@@ -1,162 +1,205 @@
 #include<stdio.h>
-#include<stdlib.h>
+
 //struct creation
 struct user{
-int UniqueId;
-char Name[20];
-int age;
+    int UniqueId;
+    char Name[50];
+    int age;
 }u;
+
 //Check if user id is unique
-int IdCheck(int id){
+int UniqueIdCheck(int id){
     FILE *ptr=fopen("users.txt","r");
     struct user temp;
     while(!feof(ptr)){
-        fscanf(ptr,"\n%d\t%s\t%d",&temp.UniqueId,&temp.Name,&temp.age);
+        fscanf(ptr,"\n%d\t%s\t%d",&temp.UniqueId,temp.Name,&temp.age);
         if(temp.UniqueId==id){
-        fclose(ptr);
-        return 1;
+            fclose(ptr);
+            return 1;
         }
     }
     fclose(ptr);
+    ptr=NULL;
     return 0;
 }
+
+//Check valid Data is Entered
+int IsValidData(int* ptr){
+    int flag=0;
+    if(scanf("%d",ptr)!=1){
+        while(getchar()!='\n');
+        flag=1;
+    }
+    return flag;
+}
+
 //Add user Data
-void AddDetails(){
+void AddUser(){
     FILE *ptr=fopen("users.txt","a");
     printf("Enter user details\n");
     printf("Enter Unique ID:");
-    scanf("%d",&u.UniqueId);
-    //Handles Unquie user id
-    if(!IdCheck(u.UniqueId)){
-    printf("Enter Name:");
-    scanf("%19s",u.Name);
-    printf("Enter Age:");
-    scanf("%d",&u.age);
-    fprintf(ptr,"\n%d\t%s\t%d",u.UniqueId,u.Name,u.age);
-    printf("Successfully added the user data...");
-    }
+    if(IsValidData(&u.UniqueId))
+        printf("Enter valid User-ID\n");
     else{
-        printf("UserId already exists...");
+        if(!UniqueIdCheck(u.UniqueId)){
+            printf("Enter Name:");
+            scanf("%49s",u.Name);
+            printf("Enter Age:");
+            if(IsValidData(&u.age)==1 || (u.age<1 || u.age>100)){
+                printf("Invalid value\n");
+            }
+            else{
+                fprintf(ptr,"\n%d\t%s\t%d",u.UniqueId,u.Name,u.age);
+                printf("Successfully added the user data...\n");
+            }
+        }
+        else{
+            printf("UserId already exists...\n");
+        }
     }
     fclose(ptr);
+    ptr=NULL;
+}
+
+int IsEmpty(FILE* ptr){
+    fseek (ptr, 0, SEEK_END);
+    int size = ftell(ptr);
+    if(size==0) {
+        return 1;
+    }
+    return 0;
 }
 //Read Details from File
 void ReadDetails(){
     FILE *ptr=fopen("users.txt","r");
-    //Check of existance of file
-    if (ptr!=NULL) {
-    //Set the pointer to end of file and check size
-    fseek (ptr, 0, SEEK_END);
-    int size = ftell(ptr);
-    //Check if File is empty
-    if (0 == size) {
-        printf("File is empty\n");
-    }
-    else{
-    //Set the pointer to beginning of file
-    fseek (ptr, 0, SEEK_SET);
-    while(!feof(ptr)){
-        fscanf(ptr,"\n%d\t%s\t%d",&u.UniqueId,&u.Name,&u.age);
-        printf("%d %s %d\n",u.UniqueId,u.Name,u.age);
-    }
-    }
-    }
+        if(IsEmpty(ptr)){
+            printf("File is empty\n");
+        }
+        else{
+        rewind(ptr);
+            while(!feof(ptr)){
+                fscanf(ptr,"\n%d\t%s\t%d",&u.UniqueId,u.Name,&u.age);
+                printf("%d\t%s\t%d\n",u.UniqueId,u.Name,u.age);
+            }
+        }
     fclose(ptr);
+    ptr=NULL;
 }
-//write into File
-void WriteDetails(){
-    FILE *ptr=fopen("users.txt","w");
-    FILE *ptr1=fopen("temp.txt","r");
-    while(!feof(ptr1)){
-        fscanf(ptr1,"\n%d\t%s\t%d",&u.UniqueId,&u.Name,&u.age);
-        fprintf(ptr,"\n%d %s %d",u.UniqueId,u.Name,u.age);
-    }
-    fclose(ptr);
-    fclose(ptr1);
-}
+
 //Update the File Data
 void UpdateDetails(int id){
     int found=0;
     FILE *ptr=fopen("users.txt","r");
     FILE *ptr1=fopen("temp.txt","w");
-    while(!feof(ptr)){     
-        fscanf(ptr,"\n%d\t%s\t%d",&u.UniqueId,&u.Name,&u.age);
-        if(u.UniqueId==id){
-        found=1;
-        printf("Enter correct details\n");
-        printf("Enter Unique ID:");
-        scanf("%d",&u.UniqueId);
-        printf("Enter Name:");
-        scanf("%s",&u.Name);
-        printf("Enter Age:");
-        scanf("%d",&u.age);
-        printf("Successfully updated the user data....\n");
+    if(IsEmpty(ptr)){
+            printf("File is empty\n");
+    }
+    else{
+        rewind(ptr);
+        while(!feof(ptr)){     
+            fscanf(ptr,"\n%d\t%s\t%d",&u.UniqueId,u.Name,&u.age);
+            if(u.UniqueId==id){
+                found=1;
+                printf("Enter correct details\n");
+                printf("Enter Name:");
+                scanf("%s",u.Name);
+                printf("Enter Age:");
+                if(IsValidData(&u.age)==1 || (u.age<1 || u.age>100)){
+                    printf("Invalid value\n");
+                    break;
+                }
+                printf("Successfully updated the user data....\n");
+            }
+            fprintf(ptr1,"\n%d\t%s\t%d",u.UniqueId,u.Name,u.age);
         }
-        fprintf(ptr1,"\n%d %s %d",u.UniqueId,u.Name,u.age);
     }
     if(found==0){
-        printf("User id doesnt exists..Either enter correct user-id");
+        printf("User id doesnt exists..Either enter correct user-id\n");
     }
     fclose(ptr);
     fclose(ptr1);
-    WriteDetails();
-    remove("temp.txt");
+    ptr=NULL;
+    ptr1=NULL;
+    remove("users.txt");
+    rename("temp.txt","users.txt");
 }
+
 //Delete the user Data
 void DeleteDetails(int id){
     int found=0;
     FILE *ptr=fopen("users.txt","r");
     FILE *ptr1=fopen("temp.txt","w");
-    while(!feof(ptr)){
-        fscanf(ptr,"\n%d\t%s\t%d",&u.UniqueId,&u.Name,&u.age);
-        if(u.UniqueId==id){
-        found=1;
-        printf("Successfully deleted the user data....\n");
-        }
-        else{
-        fprintf(ptr1,"\n%d\t%s\t%d",u.UniqueId,u.Name,u.age);
+    if(IsEmpty(ptr)){
+            printf("File is empty\n");
+    }
+    else{
+        rewind(ptr);
+        while(!feof(ptr)){               
+            fscanf(ptr,"\n%d\t%s\t%d",&u.UniqueId,u.Name,&u.age);
+            if(u.UniqueId==id){
+                found=1;
+                printf("Successfully deleted the user data....\n");
+            }
+            else{
+                fprintf(ptr1,"\n%d\t%s\t%d",u.UniqueId,u.Name,u.age);
+            }
         }
     }
     if(found==0){
-        printf("User id doesnt exists..Either enter correct user-id");
+        printf("User id doesnt exists..Either enter correct user-id\n");
     }    
     fclose(ptr);
     fclose(ptr1);
-    WriteDetails();
-    remove("temp.txt");
+    ptr=NULL;
+    ptr1=NULL;
+    remove("users.txt");
+    rename("temp.txt","users.txt");
 }
-//Main code execution
+
 int main(){
-    int id,choice;
+    int id;
+    int choice=0;
+    enum Menu{
+        ADDUSER=1,
+        READDATA,
+        UPDATEDATA,
+        DELETEDATA,
+        EXIT
+    };
     printf("---------Menu---------\n");
     printf("1.Add User Detail\n");
     printf("2.Read Details\n");
     printf("3.Update Details\n");
     printf("4.Delete Details\n");
     printf("5.Exit\n");
-    do{
+    while(choice!=5){
         printf("Enter choice:");
-        scanf("%d",&choice);
-        switch(choice){
-            case 1:AddDetails();
-                break;
-            case 2:ReadDetails();
-                break;
-            case 3:
-                printf("Enter user id to update the data\n");
-                scanf("%d",&id);
-                UpdateDetails(id);
-                break;
-            case 4:
-                printf("Enter user id to delete the data\n");
-                scanf("%d",&id);
-                DeleteDetails(id);
-                break;
-            case 5:exit(0);
-            default:
-                printf("Enter Valid choice\n");
+        if(!IsValidData(&choice)){
+            switch(choice){
+                case ADDUSER:AddUser();
+                    break;
+                case READDATA:ReadDetails();
+                    break;
+                case UPDATEDATA:
+                    printf("Enter user id to update the data\n");
+                    scanf("%d",&id);
+                    while(getchar()!='\n');
+                    UpdateDetails(id);
+                    break;
+                case DELETEDATA:
+                    printf("Enter user id to delete the data\n");
+                    scanf("%d",&id);
+                    while(getchar()!='\n');
+                    DeleteDetails(id);
+                    break;
+                case EXIT:return 0;
+                default:
+                    printf("Enter Valid choice\n");
+                    break;
+            }
         }
-
-    }while(choice!=5);
+        else
+            printf("Enter valid input\n");
+    }
     return 0;
 }
