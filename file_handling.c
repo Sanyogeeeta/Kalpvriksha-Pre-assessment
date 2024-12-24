@@ -1,6 +1,5 @@
 #include<stdio.h>
 
-//struct creation
 struct user{
     int UniqueId;
     char Name[50];
@@ -8,22 +7,20 @@ struct user{
 }u;
 
 //Check if user id is unique
-int UniqueIdCheck(int id){
+int IdCheck(int id){
     FILE *ptr=fopen("users.txt","r");
     struct user temp;
+    int flag=0;
     while(!feof(ptr)){
         fscanf(ptr,"\n%d\t%s\t%d",&temp.UniqueId,temp.Name,&temp.age);
         if(temp.UniqueId==id){
-            fclose(ptr);
-            return 1;
+        flag=1;
         }
     }
     fclose(ptr);
-    ptr=NULL;
-    return 0;
+    return flag;
 }
 
-//Check valid Data is Entered
 int IsValidData(int* ptr){
     int flag=0;
     if(scanf("%d",ptr)!=1){
@@ -33,7 +30,6 @@ int IsValidData(int* ptr){
     return flag;
 }
 
-//Add user Data
 void AddUser(){
     FILE *ptr=fopen("users.txt","a");
     printf("Enter user details\n");
@@ -41,7 +37,7 @@ void AddUser(){
     if(IsValidData(&u.UniqueId))
         printf("Enter valid User-ID\n");
     else{
-        if(!UniqueIdCheck(u.UniqueId)){
+        if(!IdCheck(u.UniqueId)){
             printf("Enter Name:");
             scanf("%49s",u.Name);
             printf("Enter Age:");
@@ -61,15 +57,17 @@ void AddUser(){
     ptr=NULL;
 }
 
+//Check if File is empty
 int IsEmpty(FILE* ptr){
+    int flag=0;
     fseek (ptr, 0, SEEK_END);
     int size = ftell(ptr);
     if(size==0) {
-        return 1;
+        flag=1;
     }
-    return 0;
+    return flag;
 }
-//Read Details from File
+
 void ReadDetails(){
     FILE *ptr=fopen("users.txt","r");
         if(IsEmpty(ptr)){
@@ -77,8 +75,7 @@ void ReadDetails(){
         }
         else{
         rewind(ptr);
-            while(!feof(ptr)){
-                fscanf(ptr,"\n%d\t%s\t%d",&u.UniqueId,u.Name,&u.age);
+            while(fscanf(ptr,"\n%d\t%s\t%d",&u.UniqueId,u.Name,&u.age)!=EOF){
                 printf("%d\t%s\t%d\n",u.UniqueId,u.Name,u.age);
             }
         }
@@ -86,7 +83,6 @@ void ReadDetails(){
     ptr=NULL;
 }
 
-//Update the File Data
 void UpdateDetails(int id){
     int found=0;
     FILE *ptr=fopen("users.txt","r");
@@ -96,8 +92,7 @@ void UpdateDetails(int id){
     }
     else{
         rewind(ptr);
-        while(!feof(ptr)){     
-            fscanf(ptr,"\n%d\t%s\t%d",&u.UniqueId,u.Name,&u.age);
+        while(fscanf(ptr,"\n%d\t%s\t%d",&u.UniqueId,u.Name,&u.age)!=EOF){     
             if(u.UniqueId==id){
                 found=1;
                 printf("Enter correct details\n");
@@ -106,8 +101,8 @@ void UpdateDetails(int id){
                 printf("Enter Age:");
                 if(IsValidData(&u.age)==1 || (u.age<1 || u.age>100)){
                     printf("Invalid value\n");
-                    break;
                 }
+                else
                 printf("Successfully updated the user data....\n");
             }
             fprintf(ptr1,"\n%d\t%s\t%d",u.UniqueId,u.Name,u.age);
@@ -124,7 +119,6 @@ void UpdateDetails(int id){
     rename("temp.txt","users.txt");
 }
 
-//Delete the user Data
 void DeleteDetails(int id){
     int found=0;
     FILE *ptr=fopen("users.txt","r");
