@@ -101,8 +101,8 @@ void UpdateDetails(int id){
                 printf("Enter Age:");
                 if(IsValidData(&u.age)==1 || (u.age<1 || u.age>100)){
                     printf("Invalid value\n");
+                    break;
                 }
-                else
                 printf("Successfully updated the user data....\n");
             }
             fprintf(ptr1,"\n%d\t%s\t%d",u.UniqueId,u.Name,u.age);
