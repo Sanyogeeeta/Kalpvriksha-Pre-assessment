@@ -1,13 +1,6 @@
 #include<stdio.h>
 #include<string.h>
 
-//store number and operator in stack
-int number[30];
-int topnum=-1;
-char operator[20];
-int topop=-1;
-
-//Check for Digit
 int IsDigit(char c){
     int flag=0;
     if(c>='0' && c<='9')
@@ -15,9 +8,10 @@ int IsDigit(char c){
     return flag;
 }
 
-//Perform arithmetic operation
-void PerformOperation(){
+void PerformOperation(int* number,char* operator,int* topno,int* topoper){
     int num1,num2,result;
+    int topnum=*topno;
+    int topop=*topoper;
     char op;
     if(topnum>=1 && topop>=0){
         num1=number[topnum--];
@@ -33,6 +27,8 @@ void PerformOperation(){
             case '/':
                 if(num1==0){
                     printf("Error: Division by zero.\n");
+                    *topno=-1;
+                    *topoper=-1;
                     return;
                 }
                 result=num2/num1;
@@ -43,12 +39,11 @@ void PerformOperation(){
     else{
         topnum=-1;
         topop=-1;
-        printf("Error: Invalid expression(Missing operand.)\n");
-        return;
     }
+    *topno=topnum;
+    *topoper=topop;
 }
 
-//operator precedence
 int precedence(char c){
     int result;
     if(c=='+'||c=='-')
@@ -58,8 +53,11 @@ int precedence(char c){
     return result;
 }
 
-//Expression evaluation
-int Evaluation(char exp[]){
+int Evaluation(char exp[]){    
+    int number[30];
+    char operator[20];
+    int topop=-1;
+    int topnum=-1;
     int i;
     char c;
     for(i=0;i<strlen(exp)-1;i++){
@@ -82,23 +80,23 @@ int Evaluation(char exp[]){
         }
         else if(c=='+'||c=='-'||c=='*'||c=='/'){
             while(!(topop==-1) && (precedence(c)<=precedence(operator[topop]))){
-                PerformOperation();
+                PerformOperation(number,operator,&topnum,&topop);
             }
             operator[++topop]=c;
         }
         else{
-            return -999;
+            topnum=0;
+            number[topnum]=-999;
         }
     }
     while(topop!=-1)
-        PerformOperation();
+        PerformOperation(number,operator,&topnum,&topop);
     if((topop==-1 && topnum!=0)||topnum==-1)
-        return -999;
+        number[++topnum]=-999;
     return number[topnum];
 }
 
 int main(){
-    //The user input for expression in string format
     char exp[50];
     printf("Enter Mathematical expression:");
     fgets(exp, sizeof(exp),stdin);
