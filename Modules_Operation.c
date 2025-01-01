@@ -1,4 +1,5 @@
 #include<stdio.h>
+
 long long unsigned Modular_Expression(unsigned long base,unsigned long exponent,unsigned long mod){
     long long unsigned result=1;
     base=base%mod;
@@ -10,14 +11,24 @@ long long unsigned Modular_Expression(unsigned long base,unsigned long exponent,
     }
     return result;
 }
+
 int main(){
-    long unsigned B,N,M;
+    long B,N,M;
     printf("Base(B):");
-    scanf("%lu",&B);
+    scanf("%ld",&B);
     printf("Exponent(N):");
-    scanf("%lu",&N);
+    scanf("%ld",&N);
     printf("Modulus(M):");
-    scanf("%lu",&M);
-    long long unsigned result=Modular_Expression(B,N,M);
-    printf("Result:%llu\n",result);
+    scanf("%ld",&M);
+    if(N<0 || M<=1)
+        printf("Enter valid Input(M>1 and N>=0)\n");
+    else
+    {   
+        long unsigned base,exponent,mod;
+        base=(unsigned long)B;
+        exponent=(unsigned long)N;
+        mod=(unsigned long)M;
+        long long unsigned result=Modular_Expression(base,exponent,mod);
+        printf("Result:%llu\n",result);
+    }
 }
