@@ -1,6 +1,5 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<ctype.h>
 
 /*
 You are given a singly linked list containing integers. Your task is to sort the linked list in ascending order using Selection Sort in such a way that the minimum number of swaps is performed.
