@@ -30,6 +30,17 @@ int hash_function(int key){
     return key%MAX;
 }
 
+void free_hashmap(hashmap* h){
+    for(int i=0;i<MAX;i++){
+        node* temp=h->hashmap[i];
+        while(temp!=NULL){
+            node* del=temp;
+            temp=temp->next;
+            free(del);
+        }
+    }
+}
+
 void insert(hashmap* h,int key,int value){
     int index=hash_function(key);
     node* new=create_node(key,value);
@@ -133,6 +144,7 @@ int main(){
             display(h);
             break;
             case EXIT:
+            free_hashmap(&h);
             printf("Exiting program.\n");
             return 0;
         }
