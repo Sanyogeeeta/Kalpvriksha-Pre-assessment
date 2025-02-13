@@ -13,8 +13,15 @@ int main() {
   /* Hint:	1. Use add function to increment the count using  threads that will call add() method internally.
   			   Do not use count variable directely.  
           	2. Wait for all threads to finish. */
-  
-  
+    
+  int threads=input/100000;
+  pthread_t p[threads];
+  for(int i=0;i<threads;i++){
+      pthread_create(&p[i],NULL,add,NULL);
+  }
+  for(int i=0;i<threads;i++){
+      pthread_join(p[i],NULL);
+  }
   printf("%d", count);
   return 0;
 }
